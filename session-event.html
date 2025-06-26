@@ -794,6 +794,7 @@
         <div class="tabs">
             <div class="tab active" id="tab-user-events" onclick="switchTab('user-events')">User Events</div>
             <div class="tab" id="tab-user-sessions" onclick="switchTab('user-sessions')">User Sessions Analytics</div>
+            <div class="tab" id="tab-session-metrics" onclick="switchTab('session-metrics')">Session Metrics</div>
         </div>
 
         <div id="dashboard-user-events" class="dashboard active">
@@ -1018,14 +1019,6 @@
                         <option value="asc">Ascending</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <label>Page</label>
-                    <input type="number" id="us_page" value="1" min="1">
-                </div>
-                <div class="filter-group">
-                    <label>Limit</label>
-                    <input type="number" id="us_limit" value="50" min="1" max="1000">
-                </div>
                 <button class="btn btn-success" onclick="fetchUserSessions()">
                     <i class="fas fa-search"></i> Fetch Sessions
                 </button>
@@ -1047,7 +1040,6 @@
                 <div id="us_error" class="error" style="display: none;"></div>
                 <div id="us_success" class="success" style="display: none;"></div>
                 <div id="us_table-tab" class="tab-content active">
-                    <div id="us_pagination" class="pagination" style="display: none;"></div>
                     <table id="us_dataTable" class="data-table" style="display: none;">
                         <thead>
                             <tr>
@@ -1067,6 +1059,67 @@
                     </table>
                 </div>
                 <pre id="us_jsonData" class="json-viewer" style="display:none;"></pre>
+            </div>
+        </div>
+
+        <!-- Session Metrics Dashboard -->
+        <div id="dashboard-session-metrics" class="dashboard" style="display:none;">
+            <div class="filters-panel">
+                <h3><i class="fas fa-chart-line"></i> Session Metrics Filters</h3>
+                <div class="filter-group">
+                    <label>Retention</label>
+                    <input type="text" id="sm_retention" placeholder="e.g., day1, day7, day30">
+                </div>
+                <div class="filter-group">
+                    <label>Average Play Time Episode</label>
+                    <input type="text" id="sm_averagePlayTimeEpisode" placeholder="Episode name">
+                </div>
+                <div class="filter-group">
+                    <label>Completed Event Game</label>
+                    <input type="text" id="sm_completedEventGame" placeholder="Game name">
+                </div>
+                <div class="filter-group">
+                    <label>Filter Dates</label>
+                    <input type="text" id="sm_filterDates" placeholder="2024-01-15,2024-01-16">
+                </div>
+                <div class="filter-group">
+                    <label>Fake User Filter</label>
+                    <input type="text" id="sm_fakeUserFilter" placeholder="tag1,tag2">
+                </div>
+                <div class="filter-group">
+                    <label>Event Date Filter</label>
+                    <input type="text" id="sm_eventDateFilter" placeholder="2024-01-15,2024-01-16">
+                </div>
+                <div class="filter-group">
+                    <label>Page</label>
+                    <input type="number" id="sm_page" value="1" min="1">
+                </div>
+                <div class="filter-group">
+                    <label>Limit</label>
+                    <input type="number" id="sm_limit" value="10" min="1" max="1000">
+                </div>
+                <button class="btn btn-success" onclick="fetchSessionMetrics()">
+                    <i class="fas fa-search"></i> Fetch Metrics
+                </button>
+                <button class="btn btn-secondary" onclick="clearSessionMetricsFilters()">
+                    <i class="fas fa-eraser"></i> Clear Filters
+                </button>
+            </div>
+            <div class="results-panel">
+                <div class="results-header">
+                    <h3><i class="fas fa-chart-bar"></i> Session Metrics Results</h3>
+                </div>
+                <div id="sm_loading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading metrics...</p>
+                </div>
+                <div id="sm_error" class="error" style="display: none;"></div>
+                <div id="sm_success" class="success" style="display: none;"></div>
+                <div id="sm_pagination" class="pagination" style="display: none;"></div>
+                <div id="sm_metrics" style="display: none;">
+                    <!-- Metrics will be populated here -->
+                </div>
+                <pre id="sm_jsonData" class="json-viewer" style="display:none;"></pre>
             </div>
         </div>
     </div>
@@ -1392,14 +1445,19 @@
         function switchTab(tab) {
             document.getElementById('tab-user-events').classList.remove('active');
             document.getElementById('tab-user-sessions').classList.remove('active');
+            document.getElementById('tab-session-metrics').classList.remove('active');
             document.getElementById('dashboard-user-events').style.display = 'none';
             document.getElementById('dashboard-user-sessions').style.display = 'none';
+            document.getElementById('dashboard-session-metrics').style.display = 'none';
             if (tab === 'user-events') {
                 document.getElementById('tab-user-events').classList.add('active');
                 document.getElementById('dashboard-user-events').style.display = 'block';
-            } else {
+            } else if (tab === 'user-sessions') {
                 document.getElementById('tab-user-sessions').classList.add('active');
                 document.getElementById('dashboard-user-sessions').style.display = 'block';
+            } else {
+                document.getElementById('tab-session-metrics').classList.add('active');
+                document.getElementById('dashboard-session-metrics').style.display = 'block';
             }
         }
 
@@ -1424,9 +1482,7 @@
                 minRetentionDays: document.getElementById('us_minRetentionDays').value,
                 maxRetentionDays: document.getElementById('us_maxRetentionDays').value,
                 sortBy: document.getElementById('us_sortBy').value,
-                sortOrder: document.getElementById('us_sortOrder').value,
-                page: document.getElementById('us_page').value,
-                limit: document.getElementById('us_limit').value
+                sortOrder: document.getElementById('us_sortOrder').value
             };
             Object.entries(filters).forEach(([key, value]) => {
                 if (value && value !== '') {
@@ -1687,7 +1743,7 @@
 
         function clearUserSessionsFilters() {
             [
-                'us_startDate','us_endDate','us_userId','us_fakeUserId','us_country','us_userType','us_platform','us_minSessions','us_maxSessions','us_minPlayTime','us_maxPlayTime','us_minRetentionDays','us_maxRetentionDays','us_page','us_limit'
+                'us_startDate','us_endDate','us_userId','us_fakeUserId','us_country','us_userType','us_platform','us_minSessions','us_maxSessions','us_minPlayTime','us_maxPlayTime','us_minRetentionDays','us_maxRetentionDays'
             ].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -1773,6 +1829,179 @@
             testButton.style.zIndex = '9999';
             document.body.appendChild(testButton);
         });
+
+        // Session Metrics API logic
+        const SM_BASE_URL = 'https://api.gamisodes.com/api/v1/user-events/session-metrics';
+        let sm_currentData = null;
+
+        function buildSessionMetricsQueryString() {
+            const params = new URLSearchParams();
+            const filters = {
+                retention: document.getElementById('sm_retention').value,
+                averagePlayTimeEpisode: document.getElementById('sm_averagePlayTimeEpisode').value,
+                completedEventGame: document.getElementById('sm_completedEventGame').value,
+                filterDates: document.getElementById('sm_filterDates').value,
+                fakeUserFilter: document.getElementById('sm_fakeUserFilter').value,
+                eventDateFilter: document.getElementById('sm_eventDateFilter').value,
+                page: document.getElementById('sm_page').value,
+                limit: document.getElementById('sm_limit').value
+            };
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value && value !== '') {
+                    params.append(key, value);
+                }
+            });
+            return params.toString();
+        }
+
+        async function fetchSessionMetrics() {
+            document.getElementById('sm_loading').style.display = 'block';
+            document.getElementById('sm_error').style.display = 'none';
+            document.getElementById('sm_success').style.display = 'none';
+            document.getElementById('sm_metrics').style.display = 'none';
+            document.getElementById('sm_pagination').style.display = 'none';
+            try {
+                const queryString = buildSessionMetricsQueryString();
+                const url = `${SM_BASE_URL}?${queryString}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        retention: document.getElementById('sm_retention').value,
+                        averagePlayTimeEpisode: document.getElementById('sm_averagePlayTimeEpisode').value,
+                        completedEventGame: document.getElementById('sm_completedEventGame').value,
+                        filterDates: document.getElementById('sm_filterDates').value ? document.getElementById('sm_filterDates').value.split(',') : [],
+                        fakeUserFilter: document.getElementById('sm_fakeUserFilter').value ? document.getElementById('sm_fakeUserFilter').value.split(',') : [],
+                        eventDateFilter: document.getElementById('sm_eventDateFilter').value ? document.getElementById('sm_eventDateFilter').value.split(',') : [],
+                        page: parseInt(document.getElementById('sm_page').value) || 1,
+                        limit: parseInt(document.getElementById('sm_limit').value) || 10
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
+                sm_currentData = data;
+                displaySessionMetricsData(data);
+                document.getElementById('sm_success').textContent = `Fetched session metrics successfully.`;
+                document.getElementById('sm_success').style.display = 'block';
+            } catch (error) {
+                document.getElementById('sm_error').textContent = error.message;
+                document.getElementById('sm_error').style.display = 'block';
+            } finally {
+                document.getElementById('sm_loading').style.display = 'none';
+            }
+        }
+
+        function displaySessionMetricsData(data) {
+            const metricsDiv = document.getElementById('sm_metrics');
+            const paginationDiv = document.getElementById('sm_pagination');
+            
+            // Display metrics
+            let metricsHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Retention</h4>
+                        <div class="value">${data.data.retention || 'N/A'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Session Count</h4>
+                        <div class="value">${data.data.average_session_count || 'N/A'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Play Length</h4>
+                        <div class="value">${data.data.average_play_length || 'N/A'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Session Length</h4>
+                        <div class="value">${data.data.average_session_length || 'N/A'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Complete Event Users</h4>
+                        <div class="value">${data.data.average_complete_event_users || 'N/A'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total Users</h4>
+                        <div class="value">${data.totalUsersCount || 'N/A'}</div>
+                    </div>
+                </div>
+            `;
+
+            // Display user events percentage
+            if (data.data.user_events_percentage && data.data.user_events_percentage.length > 0) {
+                metricsHTML += `
+                    <div class="aggregates">
+                        <h4><i class="fas fa-chart-pie"></i> User Events Percentage</h4>
+                        <div class="breakdown">
+                `;
+                data.data.user_events_percentage.forEach(item => {
+                    metricsHTML += `
+                        <div class="breakdown-item">
+                            <div class="label">${item.label}</div>
+                            <div class="count">${item.value}</div>
+                        </div>
+                    `;
+                });
+                metricsHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Display top called events
+            if (data.data.top_called_events && data.data.top_called_events.length > 0) {
+                metricsHTML += `
+                    <div class="aggregates">
+                        <h4><i class="fas fa-star"></i> Top Called Events</h4>
+                        <div class="breakdown">
+                `;
+                data.data.top_called_events.slice(0, 10).forEach(item => {
+                    metricsHTML += `
+                        <div class="breakdown-item">
+                            <div class="label">${item.name}</div>
+                            <div class="count">${item.count} (${item.percentage})</div>
+                        </div>
+                    `;
+                });
+                metricsHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            metricsDiv.innerHTML = metricsHTML;
+            metricsDiv.style.display = 'block';
+
+            // Display pagination
+            if (data.pagination && data.pagination.totalPages > 1) {
+                let paginationHTML = '';
+                if (data.pagination.hasPrev) {
+                    paginationHTML += `<button onclick="changeSessionMetricsPage(${data.pagination.page - 1})">Previous</button>`;
+                }
+                paginationHTML += `<button class="active">Page ${data.pagination.page} of ${data.pagination.totalPages}</button>`;
+                if (data.pagination.hasNext) {
+                    paginationHTML += `<button onclick="changeSessionMetricsPage(${data.pagination.page + 1})">Next</button>`;
+                }
+                paginationDiv.innerHTML = paginationHTML;
+                paginationDiv.style.display = 'flex';
+            }
+        }
+
+        function changeSessionMetricsPage(page) {
+            document.getElementById('sm_page').value = page;
+            fetchSessionMetrics();
+        }
+
+        function clearSessionMetricsFilters() {
+            [
+                'sm_retention','sm_averagePlayTimeEpisode','sm_completedEventGame','sm_filterDates','sm_fakeUserFilter','sm_eventDateFilter','sm_page','sm_limit'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('sm_page').value = '1';
+            document.getElementById('sm_limit').value = '10';
+        }
     </script>
 </body>
 </html> 
