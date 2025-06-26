@@ -623,11 +623,37 @@
 
         .modal-body {
             padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-body h3 {
+            color: #2d3748;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body h3::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 25px;
         }
@@ -637,8 +663,20 @@
             padding: 20px;
             border-radius: 12px;
             border-left: 4px solid #667eea;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .detail-item:hover {
@@ -647,12 +685,13 @@
         }
 
         .detail-item h4 {
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
             color: #2d3748;
             font-size: 0.95rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            opacity: 0.8;
         }
 
         .detail-item p {
@@ -660,19 +699,38 @@
             color: #4a5568;
             font-weight: 600;
             font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .detail-item.highlight {
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+            border-left-color: #38b2ac;
+        }
+
+        .detail-item.highlight::before {
+            background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+        }
+
+        .detail-item.important {
+            background: linear-gradient(135deg, #fef5e7 0%, #fed7aa 100%);
+            border-left-color: #ed8936;
+        }
+
+        .detail-item.important::before {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
         }
 
         .day-breakdown {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
             margin-top: 20px;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
-            padding: 10px;
-            background: rgba(247, 250, 252, 0.5);
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            border: 1px solid #cbd5e0;
         }
 
         .day-item {
@@ -680,26 +738,60 @@
             padding: 12px 8px;
             border-radius: 8px;
             text-align: center;
-            font-size: 0.85rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+        }
+
+        .day-item.active {
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+            border-color: #38b2ac;
+            box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .day-item.active::before {
+            background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
         }
 
         .day-item:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
-        .day-item .day-label {
+        .day-label {
+            font-size: 0.75rem;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 5px;
+            color: #4a5568;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .day-item .day-value {
-            color: #667eea;
+        .day-value {
+            font-size: 0.9rem;
             font-weight: 600;
+            color: #2d3748;
+        }
+
+        .day-item.active .day-label {
+            color: #2c7a7b;
+        }
+
+        .day-item.active .day-value {
+            color: #234e52;
         }
 
         .btn-small {
@@ -777,6 +869,34 @@
             font-weight: 700;
             line-height: 1.2;
         }
+
+        .export-btn {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 161, 105, 0.4);
+        }
+
+        .export-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -794,7 +914,6 @@
         <div class="tabs">
             <div class="tab active" id="tab-user-events" onclick="switchTab('user-events')">User Events</div>
             <div class="tab" id="tab-user-sessions" onclick="switchTab('user-sessions')">User Sessions Analytics</div>
-            <div class="tab" id="tab-session-metrics" onclick="switchTab('session-metrics')">Session Metrics</div>
         </div>
 
         <div id="dashboard-user-events" class="dashboard active">
@@ -888,15 +1007,12 @@
                     </label>
                 </div>
 
-                <button class="btn btn-success" onclick="fetchData()">
-                    <i class="fas fa-search"></i> Fetch Data
-                </button>
-                <button class="btn btn-secondary" onclick="clearFilters()">
-                    <i class="fas fa-eraser"></i> Clear Filters
-                </button>
-                <button class="btn" onclick="exportToCSV()">
-                    <i class="fas fa-download"></i> Export CSV
-                </button>
+                <div class="controls">
+                    <button id="fetchBtn" class="fetch-btn">📊 Fetch Data</button>
+                    <button id="exportCsvBtn" class="export-btn">📄 Export CSV</button>
+                    <button id="exportExcelBtn" class="export-btn">📊 Export Excel</button>
+                    <button id="clearBtn" class="clear-btn">🗑️ Clear</button>
+                </div>
             </div>
 
             <div class="results-panel">
@@ -1019,6 +1135,14 @@
                         <option value="asc">Ascending</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <label>Page</label>
+                    <input type="number" id="us_page" value="1" min="1">
+                </div>
+                <div class="filter-group">
+                    <label>Limit</label>
+                    <input type="number" id="us_limit" value="50" min="1" max="1000">
+                </div>
                 <button class="btn btn-success" onclick="fetchUserSessions()">
                     <i class="fas fa-search"></i> Fetch Sessions
                 </button>
@@ -1040,6 +1164,7 @@
                 <div id="us_error" class="error" style="display: none;"></div>
                 <div id="us_success" class="success" style="display: none;"></div>
                 <div id="us_table-tab" class="tab-content active">
+                    <div id="us_pagination" class="pagination" style="display: none;"></div>
                     <table id="us_dataTable" class="data-table" style="display: none;">
                         <thead>
                             <tr>
@@ -1059,67 +1184,6 @@
                     </table>
                 </div>
                 <pre id="us_jsonData" class="json-viewer" style="display:none;"></pre>
-            </div>
-        </div>
-
-        <!-- Session Metrics Dashboard -->
-        <div id="dashboard-session-metrics" class="dashboard" style="display:none;">
-            <div class="filters-panel">
-                <h3><i class="fas fa-chart-line"></i> Session Metrics Filters</h3>
-                <div class="filter-group">
-                    <label>Retention</label>
-                    <input type="text" id="sm_retention" placeholder="e.g., day1, day7, day30">
-                </div>
-                <div class="filter-group">
-                    <label>Average Play Time Episode</label>
-                    <input type="text" id="sm_averagePlayTimeEpisode" placeholder="Episode name">
-                </div>
-                <div class="filter-group">
-                    <label>Completed Event Game</label>
-                    <input type="text" id="sm_completedEventGame" placeholder="Game name">
-                </div>
-                <div class="filter-group">
-                    <label>Filter Dates</label>
-                    <input type="text" id="sm_filterDates" placeholder="2024-01-15,2024-01-16">
-                </div>
-                <div class="filter-group">
-                    <label>Fake User Filter</label>
-                    <input type="text" id="sm_fakeUserFilter" placeholder="tag1,tag2">
-                </div>
-                <div class="filter-group">
-                    <label>Event Date Filter</label>
-                    <input type="text" id="sm_eventDateFilter" placeholder="2024-01-15,2024-01-16">
-                </div>
-                <div class="filter-group">
-                    <label>Page</label>
-                    <input type="number" id="sm_page" value="1" min="1">
-                </div>
-                <div class="filter-group">
-                    <label>Limit</label>
-                    <input type="number" id="sm_limit" value="10" min="1" max="1000">
-                </div>
-                <button class="btn btn-success" onclick="fetchSessionMetrics()">
-                    <i class="fas fa-search"></i> Fetch Metrics
-                </button>
-                <button class="btn btn-secondary" onclick="clearSessionMetricsFilters()">
-                    <i class="fas fa-eraser"></i> Clear Filters
-                </button>
-            </div>
-            <div class="results-panel">
-                <div class="results-header">
-                    <h3><i class="fas fa-chart-bar"></i> Session Metrics Results</h3>
-                </div>
-                <div id="sm_loading" class="loading" style="display: none;">
-                    <i class="fas fa-spinner"></i>
-                    <p>Loading metrics...</p>
-                </div>
-                <div id="sm_error" class="error" style="display: none;"></div>
-                <div id="sm_success" class="success" style="display: none;"></div>
-                <div id="sm_pagination" class="pagination" style="display: none;"></div>
-                <div id="sm_metrics" style="display: none;">
-                    <!-- Metrics will be populated here -->
-                </div>
-                <pre id="sm_jsonData" class="json-viewer" style="display:none;"></pre>
             </div>
         </div>
     </div>
@@ -1434,30 +1498,104 @@
             showSuccess('CSV exported successfully');
         }
 
-        // Set default date to today
+        // Initialize the dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
+            // Set default dates
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+            // Event listeners
+            document.getElementById('fetchBtn').addEventListener('click', fetchData);
+            document.getElementById('exportCsvBtn').addEventListener('click', exportToCSV);
+            document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+            document.getElementById('clearBtn').addEventListener('click', clearFilters);
+
+            // Add test modal button for debugging
+            const testButton = document.createElement('button');
+            testButton.textContent = 'Test Modal';
+            testButton.onclick = () => {
+                showUserDetails({
+                    username: 'Test User',
+                    user_id: 'test123',
+                    total_sessions: 5,
+                    total_play_time: 120,
+                    first_open_date: '2024-01-01T00:00:00.000Z'
+                });
+            };
+            testButton.style.position = 'fixed';
+            testButton.style.top = '10px';
+            testButton.style.right = '10px';
+            testButton.style.zIndex = '9999';
+            document.body.appendChild(testButton);
         });
+
+        // Excel export function
+        async function exportToExcel() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates for Excel export.');
+                return;
+            }
+
+            try {
+                const exportBtn = document.getElementById('exportExcelBtn');
+                exportBtn.disabled = true;
+                exportBtn.textContent = '⏳ Generating Excel...';
+
+                const response = await fetch(`/user-events/user-sessions/excel?startDate=${startDate}&endDate=${endDate}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get the blob from the response
+                const blob = await response.blob();
+                
+                // Create a download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `user_sessions_${startDate}_to_${endDate}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                alert('Excel file downloaded successfully! The file contains:\n\nSheet 1: User Sessions Summary\nSheet 2: Last 30 Days Detailed Records');
+
+            } catch (error) {
+                console.error('Error exporting to Excel:', error);
+                alert('Error exporting to Excel: ' + error.message);
+            } finally {
+                const exportBtn = document.getElementById('exportExcelBtn');
+                exportBtn.disabled = false;
+                exportBtn.textContent = '📊 Export Excel';
+            }
+        }
 
         // Tab switching logic
         function switchTab(tab) {
             document.getElementById('tab-user-events').classList.remove('active');
             document.getElementById('tab-user-sessions').classList.remove('active');
-            document.getElementById('tab-session-metrics').classList.remove('active');
             document.getElementById('dashboard-user-events').style.display = 'none';
             document.getElementById('dashboard-user-sessions').style.display = 'none';
-            document.getElementById('dashboard-session-metrics').style.display = 'none';
             if (tab === 'user-events') {
                 document.getElementById('tab-user-events').classList.add('active');
                 document.getElementById('dashboard-user-events').style.display = 'block';
-            } else if (tab === 'user-sessions') {
+            } else {
                 document.getElementById('tab-user-sessions').classList.add('active');
                 document.getElementById('dashboard-user-sessions').style.display = 'block';
-            } else {
-                document.getElementById('tab-session-metrics').classList.add('active');
-                document.getElementById('dashboard-session-metrics').style.display = 'block';
             }
         }
 
@@ -1482,7 +1620,9 @@
                 minRetentionDays: document.getElementById('us_minRetentionDays').value,
                 maxRetentionDays: document.getElementById('us_maxRetentionDays').value,
                 sortBy: document.getElementById('us_sortBy').value,
-                sortOrder: document.getElementById('us_sortOrder').value
+                sortOrder: document.getElementById('us_sortOrder').value,
+                page: document.getElementById('us_page').value,
+                limit: document.getElementById('us_limit').value
             };
             Object.entries(filters).forEach(([key, value]) => {
                 if (value && value !== '') {
@@ -1568,7 +1708,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="details-grid">
-                        <div class="detail-item">
+                        <div class="detail-item highlight">
                             <h4>Username</h4>
                             <p>${userData.username || 'N/A'}</p>
                         </div>
@@ -1592,31 +1732,23 @@
                             <h4>Platform</h4>
                             <p>${userData.platform || 'N/A'}</p>
                         </div>
-                        <div class="detail-item">
-                            <h4>App Version</h4>
-                            <p>${userData.app_version || 'N/A'}</p>
-                        </div>
-                        <div class="detail-item">
-                            <h4>Source</h4>
-                            <p>${userData.source || 'N/A'}</p>
-                        </div>
-                        <div class="detail-item">
+                        <div class="detail-item important">
                             <h4>Total Sessions</h4>
                             <p>${userData.total_sessions || 0}</p>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail-item important">
                             <h4>Total Play Time</h4>
                             <p>${userData.total_play_time || 0} minutes</p>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail-item important">
                             <h4>Average Play Time</h4>
                             <p>${userData.average_play_time || 0} minutes</p>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail-item highlight">
                             <h4>Days Retained</h4>
                             <p>${userData.days_retained || 0}</p>
                         </div>
-                        <div class="detail-item">
+                        <div class="detail-item highlight">
                             <h4>Retention Percentage</h4>
                             <p>${userData.retention_percentage || 0}%</p>
                         </div>
@@ -1624,9 +1756,14 @@
                             <h4>Total Days Visited</h4>
                             <p>${userData.total_days_visited || 0}</p>
                         </div>
-                        <div class="detail-item">
-                            <h4>First Open Date</h4>
-                            <p>${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString() : 'N/A'}</p>
+                        <div class="detail-item important">
+                            <h4>Original First Open Date</h4>
+                            <p>${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric',
+                                weekday: 'long'
+                            }) : 'N/A'}</p>
                         </div>
                         <div class="detail-item">
                             <h4>Last Event</h4>
@@ -1638,28 +1775,36 @@
                         </div>
                     </div>
 
-                    <h3>Session Times</h3>
-                    <div class="detail-item">
+                    <h3>📊 Activity Overview</h3>
+                    <div class="detail-item" style="grid-column: 1 / -1; margin-bottom: 20px; background: linear-gradient(135deg, #e6f3ff 0%, #b3d9ff 100%); border-left-color: #3182ce;">
+                        <h4>📅 Tracking Period</h4>
+                        <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>${userData.total_days_from_first_event || 0} days</strong> tracked from <strong>${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric'
+                        }) : 'N/A'}</strong> (Day 0) to today (Day ${userData.total_days_from_first_event - 1 || 0})</p>
+                        <p style="font-size: 1.1rem; color: #2d3748;"><strong>📈 Activity Summary:</strong> <span style="color: #3182ce; font-weight: 700;">${userData.total_days_visited || 0} days with activity</span> out of ${userData.total_days_from_first_event || 0} total days (<span style="color: #38a169; font-weight: 700;">${userData.retention_percentage || 0}% retention</span>)</p>
+                    </div>
+
+                    <h3>⏰ Session Details</h3>
+                    <div class="detail-item" style="grid-column: 1 / -1;">
                         <h4>All Session Times</h4>
-                        <p>${userData.session_times && userData.session_times.length > 0 ? userData.session_times.join(', ') : 'N/A'}</p>
+                        <p style="font-family: 'Monaco', 'Menlo', monospace; background: #f7fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">${userData.session_times && userData.session_times.length > 0 ? userData.session_times.join(', ') : 'N/A'}</p>
                     </div>
 
-                    <h3>Day 0 Sessions</h3>
-                    <div class="detail-item">
-                        <h4>Day 0 Total Sessions</h4>
-                        <p>${userData.d0_total_sessions || 0}</p>
-                    </div>
-                    <div class="detail-item">
-                        <h4>Day 0 Session Lengths</h4>
-                        <p>${userData.d0_session_lengths && userData.d0_session_lengths.length > 0 ? userData.d0_session_lengths.join(', ') : 'N/A'}</p>
+                    <h3>🎯 Day 0 Sessions (First Day)</h3>
+                    <div class="details-grid">
+                        <div class="detail-item highlight">
+                            <h4>Day 0 Total Sessions</h4>
+                            <p>${userData.d0_total_sessions || 0}</p>
+                        </div>
+                        <div class="detail-item highlight">
+                            <h4>Day 0 Session Lengths</h4>
+                            <p style="font-family: 'Monaco', 'Menlo', monospace;">${userData.d0_session_lengths && userData.d0_session_lengths.length > 0 ? userData.d0_session_lengths.join(', ') : 'N/A'}</p>
+                        </div>
                     </div>
 
-                    <h3>Daily Play Time Breakdown</h3>
-                    <div class="detail-item" style="grid-column: 1 / -1; margin-bottom: 15px;">
-                        <h4>Tracking Period</h4>
-                        <p>${userData.total_days_from_first_event || 0} days tracked from ${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString() : 'N/A'} (Day 0) to today (Day ${userData.total_days_from_first_event - 1 || 0})</p>
-                        <p><strong>Activity Summary:</strong> ${userData.total_days_visited || 0} days with activity out of ${userData.total_days_from_first_event || 0} total days (${userData.retention_percentage || 0}% retention)</p>
-                    </div>
+                    <h3>📈 Daily Play Time Breakdown</h3>
                     <div class="day-breakdown">`;
 
             // Add day breakdown
@@ -1668,8 +1813,9 @@
                 const dayKey = `day${i}_play_time`;
                 const playTime = userData[dayKey] || 0;
                 const dayLabel = i === 0 ? 'Day 0 (First Day)' : `Day ${i}`;
+                const isActive = playTime > 0;
                 modalContent.innerHTML += `
-                    <div class="day-item">
+                    <div class="day-item ${isActive ? 'active' : ''}">
                         <div class="day-label">${dayLabel}</div>
                         <div class="day-value">${playTime} minutes</div>
                     </div>`;
@@ -1678,7 +1824,7 @@
             modalContent.innerHTML += `
                     </div>
 
-                    <h3>Game-Specific Metrics</h3>
+                    <h3>🎮 Game-Specific Metrics</h3>
                     <div class="details-grid">
                         <div class="detail-item">
                             <h4>BBE Total Play Time</h4>
@@ -1718,10 +1864,10 @@
                         </div>
                     </div>
 
-                    <h3>User Path</h3>
-                    <div class="detail-item">
+                    <h3>🛤️ User Journey</h3>
+                    <div class="detail-item" style="grid-column: 1 / -1;">
                         <h4>Event Sequence</h4>
-                        <p>${userData.path || 'N/A'}</p>
+                        <p style="font-family: 'Monaco', 'Menlo', monospace; background: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.6; max-height: 200px; overflow-y: auto;">${userData.path || 'N/A'}</p>
                     </div>
                 </div>
             `;
@@ -1743,7 +1889,7 @@
 
         function clearUserSessionsFilters() {
             [
-                'us_startDate','us_endDate','us_userId','us_fakeUserId','us_country','us_userType','us_platform','us_minSessions','us_maxSessions','us_minPlayTime','us_maxPlayTime','us_minRetentionDays','us_maxRetentionDays'
+                'us_startDate','us_endDate','us_userId','us_fakeUserId','us_country','us_userType','us_platform','us_minSessions','us_maxSessions','us_minPlayTime','us_maxPlayTime','us_minRetentionDays','us_maxRetentionDays','us_page','us_limit'
             ].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -1830,178 +1976,11 @@
             document.body.appendChild(testButton);
         });
 
-        // Session Metrics API logic
-        const SM_BASE_URL = 'https://api.gamisodes.com/api/v1/user-events/session-metrics';
-        let sm_currentData = null;
-
-        function buildSessionMetricsQueryString() {
-            const params = new URLSearchParams();
-            const filters = {
-                retention: document.getElementById('sm_retention').value,
-                averagePlayTimeEpisode: document.getElementById('sm_averagePlayTimeEpisode').value,
-                completedEventGame: document.getElementById('sm_completedEventGame').value,
-                filterDates: document.getElementById('sm_filterDates').value,
-                fakeUserFilter: document.getElementById('sm_fakeUserFilter').value,
-                eventDateFilter: document.getElementById('sm_eventDateFilter').value,
-                page: document.getElementById('sm_page').value,
-                limit: document.getElementById('sm_limit').value
-            };
-            Object.entries(filters).forEach(([key, value]) => {
-                if (value && value !== '') {
-                    params.append(key, value);
-                }
-            });
-            return params.toString();
-        }
-
-        async function fetchSessionMetrics() {
-            document.getElementById('sm_loading').style.display = 'block';
-            document.getElementById('sm_error').style.display = 'none';
-            document.getElementById('sm_success').style.display = 'none';
-            document.getElementById('sm_metrics').style.display = 'none';
-            document.getElementById('sm_pagination').style.display = 'none';
-            try {
-                const queryString = buildSessionMetricsQueryString();
-                const url = `${SM_BASE_URL}?${queryString}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        retention: document.getElementById('sm_retention').value,
-                        averagePlayTimeEpisode: document.getElementById('sm_averagePlayTimeEpisode').value,
-                        completedEventGame: document.getElementById('sm_completedEventGame').value,
-                        filterDates: document.getElementById('sm_filterDates').value ? document.getElementById('sm_filterDates').value.split(',') : [],
-                        fakeUserFilter: document.getElementById('sm_fakeUserFilter').value ? document.getElementById('sm_fakeUserFilter').value.split(',') : [],
-                        eventDateFilter: document.getElementById('sm_eventDateFilter').value ? document.getElementById('sm_eventDateFilter').value.split(',') : [],
-                        page: parseInt(document.getElementById('sm_page').value) || 1,
-                        limit: parseInt(document.getElementById('sm_limit').value) || 10
-                    })
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
-                sm_currentData = data;
-                displaySessionMetricsData(data);
-                document.getElementById('sm_success').textContent = `Fetched session metrics successfully.`;
-                document.getElementById('sm_success').style.display = 'block';
-            } catch (error) {
-                document.getElementById('sm_error').textContent = error.message;
-                document.getElementById('sm_error').style.display = 'block';
-            } finally {
-                document.getElementById('sm_loading').style.display = 'none';
-            }
-        }
-
-        function displaySessionMetricsData(data) {
-            const metricsDiv = document.getElementById('sm_metrics');
-            const paginationDiv = document.getElementById('sm_pagination');
-            
-            // Display metrics
-            let metricsHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h4>Retention</h4>
-                        <div class="value">${data.data.retention || 'N/A'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Average Session Count</h4>
-                        <div class="value">${data.data.average_session_count || 'N/A'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Average Play Length</h4>
-                        <div class="value">${data.data.average_play_length || 'N/A'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Average Session Length</h4>
-                        <div class="value">${data.data.average_session_length || 'N/A'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Average Complete Event Users</h4>
-                        <div class="value">${data.data.average_complete_event_users || 'N/A'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Total Users</h4>
-                        <div class="value">${data.totalUsersCount || 'N/A'}</div>
-                    </div>
-                </div>
-            `;
-
-            // Display user events percentage
-            if (data.data.user_events_percentage && data.data.user_events_percentage.length > 0) {
-                metricsHTML += `
-                    <div class="aggregates">
-                        <h4><i class="fas fa-chart-pie"></i> User Events Percentage</h4>
-                        <div class="breakdown">
-                `;
-                data.data.user_events_percentage.forEach(item => {
-                    metricsHTML += `
-                        <div class="breakdown-item">
-                            <div class="label">${item.label}</div>
-                            <div class="count">${item.value}</div>
-                        </div>
-                    `;
-                });
-                metricsHTML += `
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Display top called events
-            if (data.data.top_called_events && data.data.top_called_events.length > 0) {
-                metricsHTML += `
-                    <div class="aggregates">
-                        <h4><i class="fas fa-star"></i> Top Called Events</h4>
-                        <div class="breakdown">
-                `;
-                data.data.top_called_events.slice(0, 10).forEach(item => {
-                    metricsHTML += `
-                        <div class="breakdown-item">
-                            <div class="label">${item.name}</div>
-                            <div class="count">${item.count} (${item.percentage})</div>
-                        </div>
-                    `;
-                });
-                metricsHTML += `
-                        </div>
-                    </div>
-                `;
-            }
-
-            metricsDiv.innerHTML = metricsHTML;
-            metricsDiv.style.display = 'block';
-
-            // Display pagination
-            if (data.pagination && data.pagination.totalPages > 1) {
-                let paginationHTML = '';
-                if (data.pagination.hasPrev) {
-                    paginationHTML += `<button onclick="changeSessionMetricsPage(${data.pagination.page - 1})">Previous</button>`;
-                }
-                paginationHTML += `<button class="active">Page ${data.pagination.page} of ${data.pagination.totalPages}</button>`;
-                if (data.pagination.hasNext) {
-                    paginationHTML += `<button onclick="changeSessionMetricsPage(${data.pagination.page + 1})">Next</button>`;
-                }
-                paginationDiv.innerHTML = paginationHTML;
-                paginationDiv.style.display = 'flex';
-            }
-        }
-
-        function changeSessionMetricsPage(page) {
-            document.getElementById('sm_page').value = page;
-            fetchSessionMetrics();
-        }
-
-        function clearSessionMetricsFilters() {
-            [
-                'sm_retention','sm_averagePlayTimeEpisode','sm_completedEventGame','sm_filterDates','sm_fakeUserFilter','sm_eventDateFilter','sm_page','sm_limit'
-            ].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
-            document.getElementById('sm_page').value = '1';
-            document.getElementById('sm_limit').value = '10';
-        }
+        // Event listeners
+        document.getElementById('fetchBtn').addEventListener('click', fetchData);
+        document.getElementById('exportCsvBtn').addEventListener('click', exportToCSV);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('clearBtn').addEventListener('click', clearFilters);
     </script>
 </body>
 </html> 
