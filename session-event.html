@@ -664,9 +664,15 @@
 
         .day-breakdown {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             gap: 8px;
             margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(247, 250, 252, 0.5);
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
         .day-item {
@@ -782,7 +788,7 @@
 
         <div class="api-info">
             <h3><i class="fas fa-info-circle"></i> API Endpoint</h3>
-            <div class="endpoint">GET https://api.gamisodes.com/api/v1user-events/events</div>
+            <div class="endpoint">GET https://api.gamisodes.com/api/v1/user-events/events</div>
         </div>
 
         <div class="tabs">
@@ -1398,7 +1404,7 @@
         }
 
         // User Sessions API logic
-        const US_BASE_URL = 'https://api.gamisodes.com/api/v1user-events/user-sessions';
+        const US_BASE_URL = 'https://api.gamisodes.com/api/v1/user-events/user-sessions';
         let us_currentData = null;
 
         function buildUserSessionsQueryString() {
@@ -1593,15 +1599,22 @@
                     </div>
 
                     <h3>Daily Play Time Breakdown</h3>
+                    <div class="detail-item" style="grid-column: 1 / -1; margin-bottom: 15px;">
+                        <h4>Tracking Period</h4>
+                        <p>${userData.total_days_from_first_event || 0} days tracked from ${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString() : 'N/A'} (Day 0) to today (Day ${userData.total_days_from_first_event - 1 || 0})</p>
+                        <p><strong>Activity Summary:</strong> ${userData.total_days_visited || 0} days with activity out of ${userData.total_days_from_first_event || 0} total days (${userData.retention_percentage || 0}% retention)</p>
+                    </div>
                     <div class="day-breakdown">`;
 
             // Add day breakdown
-            for (let i = 0; i <= 30; i++) {
+            const totalDays = userData.total_days_from_first_event || 30; // fallback to 30 if not available
+            for (let i = 0; i <= totalDays; i++) {
                 const dayKey = `day${i}_play_time`;
                 const playTime = userData[dayKey] || 0;
+                const dayLabel = i === 0 ? 'Day 0 (First Day)' : `Day ${i}`;
                 modalContent.innerHTML += `
                     <div class="day-item">
-                        <div class="day-label">Day ${i}</div>
+                        <div class="day-label">${dayLabel}</div>
                         <div class="day-value">${playTime} minutes</div>
                     </div>`;
             }
@@ -1686,11 +1699,26 @@
         function exportUserSessionsToCSV() {
             if (!us_currentData || !us_currentData.data) return;
             const rows = us_currentData.data;
+            
+            // Get the maximum number of days from all users
+            const maxDays = Math.max(...rows.map(row => row.total_days_from_first_event || 30));
+            
+            // Generate dynamic day headers
+            const dayHeaders = [];
+            for (let i = 0; i <= maxDays; i++) {
+                dayHeaders.push(`day${i}_play_time`);
+            }
+            
             const headers = [
                 'username','fake_user_id','country','user_type','platform','app_version','source','total_sessions','session_times','total_play_time','path',
-                'day0_play_time','day1_play_time','day2_play_time','day3_play_time','day4_play_time','day5_play_time','day6_play_time','day7_play_time','day8_play_time','day9_play_time','day10_play_time','day11_play_time','day12_play_time','day13_play_time','day14_play_time','day15_play_time','day16_play_time','day17_play_time','day18_play_time','day19_play_time','day20_play_time','day21_play_time','day22_play_time','day23_play_time','day24_play_time','day25_play_time','day26_play_time','day27_play_time','day28_play_time','day29_play_time','day30_play_time','last_event','total_days_visited','days_retained','first_open_date','average_play_time','retained_from_previous_day','retention_percentage','bbe_total_play_time','bbe_cl1_a_total_completes','bbe_cla_total_play_time','bbe_cl1_b_total_completes','bbe_clb_total_play_time','bbe_oe2_1_total_completes','bbe_oe2_1_total_play_time','bbe_oe2_2_total_completes','bbe_oe2_2_total_play_time','d0_total_sessions','d0_session_lengths'
+                ...dayHeaders,
+                'last_event','total_days_visited','days_retained','first_open_date','average_play_time','retained_from_previous_day','retention_percentage','bbe_total_play_time','bbe_cl1_a_total_completes','bbe_cla_total_play_time','bbe_cl1_b_total_completes','bbe_clb_total_play_time','bbe_oe2_1_total_completes','bbe_oe2_1_total_play_time','bbe_oe2_2_total_completes','bbe_oe2_2_total_play_time','d0_total_sessions','d0_session_lengths','total_days_from_first_event'
             ];
-            let csv = headers.join(',') + '\n';
+            
+            // Add header comment explaining day numbering
+            let csv = '# Day numbering: day0 = first day of user activity, day1 = second day, etc.\n';
+            csv += headers.join(',') + '\n';
+            
             rows.forEach(row => {
                 csv += headers.map(h => {
                     let val = row[h];
