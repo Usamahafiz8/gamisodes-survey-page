@@ -234,17 +234,38 @@
         .data-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .data-table th {
-            background: #f7fafc;
+            background-color: #f8f9fa;
             font-weight: 600;
-            color: #2d3748;
+            color: #495057;
+        }
+
+        .data-table td {
+            color: #212529;
         }
 
         .data-table tr:hover {
-            background: #f7fafc;
+            background-color: #f8f9fa;
+        }
+
+        /* Username column styling */
+        .data-table td:nth-child(1) {
+            font-weight: 500;
+            color: #007bff;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .data-table td:nth-child(2) {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .pagination {
@@ -359,19 +380,33 @@
             display: flex;
             margin-bottom: 20px;
             border-bottom: 2px solid #e2e8f0;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+            padding: 0 10px;
         }
 
         .tab {
-            padding: 10px 20px;
+            padding: 15px 25px;
             cursor: pointer;
-            border-bottom: 2px solid transparent;
+            border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
+            font-weight: 500;
+            color: #6c757d;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            color: #495057;
         }
 
         .tab.active {
             border-bottom-color: #667eea;
             color: #667eea;
             font-weight: 600;
+            background: white;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
         }
 
         .tab-content {
@@ -395,6 +430,96 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-item h4 {
+            margin: 0 0 5px 0;
+            color: #2d3748;
+            font-size: 0.9rem;
+        }
+
+        .detail-item p {
+            margin: 0;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .day-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .day-item {
+            background: white;
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .day-item .day-label {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .day-item .day-value {
+            color: #667eea;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
     </style>
 </head>
 <body>
@@ -406,10 +531,15 @@
 
         <div class="api-info">
             <h3><i class="fas fa-info-circle"></i> API Endpoint</h3>
-            <div class="endpoint">GET https://api.gamisodes.com/api/v1/user-events/events</div>
+            <div class="endpoint">GET http://localhost:3000/api/v1/user-events/events</div>
         </div>
 
-        <div class="dashboard">
+        <div class="tabs">
+            <div class="tab active" id="tab-user-events" onclick="switchTab('user-events')">User Events</div>
+            <div class="tab" id="tab-user-sessions" onclick="switchTab('user-sessions')">User Sessions Analytics</div>
+        </div>
+
+        <div id="dashboard-user-events" class="dashboard active">
             <div class="filters-panel">
                 <h3><i class="fas fa-filter"></i> Filters</h3>
                 
@@ -558,10 +688,281 @@
                 </div>
             </div>
         </div>
+
+        <div id="dashboard-user-sessions" class="dashboard" style="display:none;">
+            <div class="filters-panel">
+                <h3><i class="fas fa-filter"></i> User Sessions Filters</h3>
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <div class="date-inputs">
+                        <input type="date" id="us_startDate" placeholder="Start Date">
+                        <input type="date" id="us_endDate" placeholder="End Date">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>User ID</label>
+                    <input type="text" id="us_userId" placeholder="User ID">
+                </div>
+                <div class="filter-group">
+                    <label>Fake User ID</label>
+                    <input type="text" id="us_fakeUserId" placeholder="Fake User ID">
+                </div>
+                <div class="filter-group">
+                    <label>Country</label>
+                    <input type="text" id="us_country" placeholder="Country">
+                </div>
+                <div class="filter-group">
+                    <label>User Type</label>
+                    <input type="text" id="us_userType" placeholder="User Type (free/paid)">
+                </div>
+                <div class="filter-group">
+                    <label>Platform</label>
+                    <input type="text" id="us_platform" placeholder="Platform (ios/android)">
+                </div>
+                <div class="filter-group">
+                    <label>Min Sessions</label>
+                    <input type="number" id="us_minSessions" min="0">
+                </div>
+                <div class="filter-group">
+                    <label>Max Sessions</label>
+                    <input type="number" id="us_maxSessions" min="0">
+                </div>
+                <div class="filter-group">
+                    <label>Min Play Time (min)</label>
+                    <input type="number" id="us_minPlayTime" min="0">
+                </div>
+                <div class="filter-group">
+                    <label>Max Play Time (min)</label>
+                    <input type="number" id="us_maxPlayTime" min="0">
+                </div>
+                <div class="filter-group">
+                    <label>Min Retention Days</label>
+                    <input type="number" id="us_minRetentionDays" min="0">
+                </div>
+                <div class="filter-group">
+                    <label>Max Retention Days</label>
+                    <input type="number" id="us_maxRetentionDays" min="0">
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="us_sortBy">
+                        <option value="total_sessions">Total Sessions</option>
+                        <option value="total_play_time">Total Play Time</option>
+                        <option value="days_retained">Days Retained</option>
+                        <option value="retention_percentage">Retention %</option>
+                        <option value="last_event">Last Event</option>
+                        <option value="first_open_date">First Open Date</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort Order</label>
+                    <select id="us_sortOrder">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Page</label>
+                    <input type="number" id="us_page" value="1" min="1">
+                </div>
+                <div class="filter-group">
+                    <label>Limit</label>
+                    <input type="number" id="us_limit" value="50" min="1" max="1000">
+                </div>
+                <button class="btn btn-success" onclick="fetchUserSessions()">
+                    <i class="fas fa-search"></i> Fetch Sessions
+                </button>
+                <button class="btn btn-secondary" onclick="clearUserSessionsFilters()">
+                    <i class="fas fa-eraser"></i> Clear Filters
+                </button>
+                <button class="btn" onclick="exportUserSessionsToCSV()">
+                    <i class="fas fa-download"></i> Export CSV
+                </button>
+            </div>
+            <div class="results-panel">
+                <div class="results-header">
+                    <h3><i class="fas fa-database"></i> User Sessions Results</h3>
+                </div>
+                <div id="us_loading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading data...</p>
+                </div>
+                <div id="us_error" class="error" style="display: none;"></div>
+                <div id="us_success" class="success" style="display: none;"></div>
+                <div id="us_table-tab" class="tab-content active">
+                    <div id="us_pagination" class="pagination" style="display: none;"></div>
+                    <table id="us_dataTable" class="data-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Fake User ID</th>
+                                <th>Country</th>
+                                <th>Total Sessions</th>
+                                <th>Total Play Time</th>
+                                <th>Days Retained</th>
+                                <th>Retention %</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userSessionsTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <pre id="us_jsonData" class="json-viewer" style="display:none;"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Session Details Modal -->
+    <div id="userSessionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Session Details for Unknown User</h3>
+                <span class="close" onclick="closeUserSessionModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <h4>Username</h4>
+                        <p>${userData.username || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>User ID</h4>
+                        <p>${userData.user_id || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Fake User ID</h4>
+                        <p>${userData.fake_user_id || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Country</h4>
+                        <p>${userData.country || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>User Type</h4>
+                        <p>${userData.user_type || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Platform</h4>
+                        <p>${userData.platform || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>App Version</h4>
+                        <p>${userData.app_version || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Source</h4>
+                        <p>${userData.source || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Total Sessions</h4>
+                        <p>${userData.total_sessions || 0}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Total Play Time</h4>
+                        <p>${userData.total_play_time || 0} minutes</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Average Play Time</h4>
+                        <p>${userData.average_play_time || 0} minutes</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Days Retained</h4>
+                        <p>${userData.days_retained || 0}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Retention Percentage</h4>
+                        <p>${userData.retention_percentage || 0}%</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Total Days Visited</h4>
+                        <p>${userData.total_days_visited || 0}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>First Open Date</h4>
+                        <p>${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString() : 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Last Event</h4>
+                        <p>${userData.last_event || 'N/A'}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Retained from Previous Day</h4>
+                        <p>${userData.retained_from_previous_day ? 'Yes' : 'No'}</p>
+                    </div>
+                </div>
+
+                <h3>Session Times</h3>
+                <div class="detail-item">
+                    <h4>All Session Times</h4>
+                    <p>${userData.session_times && userData.session_times.length > 0 ? userData.session_times.join(', ') : 'N/A'}</p>
+                </div>
+
+                <h3>Day 0 Sessions</h3>
+                <div class="detail-item">
+                    <h4>Day 0 Total Sessions</h4>
+                    <p>${userData.d0_total_sessions || 0}</p>
+                </div>
+                <div class="detail-item">
+                    <h4>Day 0 Session Lengths</h4>
+                    <p>${userData.d0_session_lengths && userData.d0_session_lengths.length > 0 ? userData.d0_session_lengths.join(', ') : 'N/A'}</p>
+                </div>
+
+                <h3>Daily Play Time Breakdown</h3>
+                <div class="day-breakdown">
+            </div>
+
+            <h3>Game-Specific Metrics</h3>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <h4>BBE Total Play Time</h4>
+                    <p>${userData.bbe_total_play_time || 0} minutes</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE CL1-A Total Completes</h4>
+                    <p>${userData.bbe_cl1_a_total_completes || 0}</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE CLA Total Play Time</h4>
+                    <p>${userData.bbe_cla_total_play_time || 0} minutes</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE CL1-B Total Completes</h4>
+                    <p>${userData.bbe_cl1_b_total_completes || 0}</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE CLB Total Play Time</h4>
+                    <p>${userData.bbe_clb_total_play_time || 0} minutes</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE OE2-1 Total Completes</h4>
+                    <p>${userData.bbe_oe2_1_total_completes || 0}</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE OE2-1 Total Play Time</h4>
+                    <p>${userData.bbe_oe2_1_total_play_time || 0} minutes</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE OE2-2 Total Completes</h4>
+                    <p>${userData.bbe_oe2_2_total_completes || 0}</p>
+                </div>
+                <div class="detail-item">
+                    <h4>BBE OE2-2 Total Play Time</h4>
+                    <p>${userData.bbe_oe2_2_total_play_time || 0} minutes</p>
+                </div>
+            </div>
+
+            <h3>User Path</h3>
+            <div class="detail-item">
+                <h4>Event Sequence</h4>
+                <p>${userData.path || 'N/A'}</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        const BASE_URL = 'https://api.gamisodes.com/api/v1';
+        const BASE_URL = 'http://localhost:3000/api/v1';
         let currentData = null;
 
         function showTab(tabName) {
@@ -869,6 +1270,318 @@
             document.getElementById('startDate').value = today;
             document.getElementById('endDate').value = today;
         });
+
+        // Tab switching logic
+        function switchTab(tab) {
+            document.getElementById('tab-user-events').classList.remove('active');
+            document.getElementById('tab-user-sessions').classList.remove('active');
+            document.getElementById('dashboard-user-events').style.display = 'none';
+            document.getElementById('dashboard-user-sessions').style.display = 'none';
+            if (tab === 'user-events') {
+                document.getElementById('tab-user-events').classList.add('active');
+                document.getElementById('dashboard-user-events').style.display = 'block';
+            } else {
+                document.getElementById('tab-user-sessions').classList.add('active');
+                document.getElementById('dashboard-user-sessions').style.display = 'block';
+            }
+        }
+
+        // User Sessions API logic
+        const US_BASE_URL = 'http://localhost:3000/api/v1/user-events/user-sessions';
+        let us_currentData = null;
+
+        function buildUserSessionsQueryString() {
+            const params = new URLSearchParams();
+            const filters = {
+                startDate: document.getElementById('us_startDate').value,
+                endDate: document.getElementById('us_endDate').value,
+                userId: document.getElementById('us_userId').value,
+                fakeUserId: document.getElementById('us_fakeUserId').value,
+                country: document.getElementById('us_country').value,
+                userType: document.getElementById('us_userType').value,
+                platform: document.getElementById('us_platform').value,
+                minSessions: document.getElementById('us_minSessions').value,
+                maxSessions: document.getElementById('us_maxSessions').value,
+                minPlayTime: document.getElementById('us_minPlayTime').value,
+                maxPlayTime: document.getElementById('us_maxPlayTime').value,
+                minRetentionDays: document.getElementById('us_minRetentionDays').value,
+                maxRetentionDays: document.getElementById('us_maxRetentionDays').value,
+                sortBy: document.getElementById('us_sortBy').value,
+                sortOrder: document.getElementById('us_sortOrder').value,
+                page: document.getElementById('us_page').value,
+                limit: document.getElementById('us_limit').value
+            };
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value && value !== '') {
+                    params.append(key, value);
+                }
+            });
+            return params.toString();
+        }
+
+        async function fetchUserSessions() {
+            document.getElementById('us_loading').style.display = 'block';
+            document.getElementById('us_error').style.display = 'none';
+            document.getElementById('us_success').style.display = 'none';
+            document.getElementById('us_dataTable').style.display = 'none';
+            try {
+                const queryString = buildUserSessionsQueryString();
+                const url = `${US_BASE_URL}?${queryString}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
+                us_currentData = data;
+                displayUserSessionsData(data);
+                document.getElementById('us_success').textContent = `Fetched ${data.data.length} user sessions.`;
+                document.getElementById('us_success').style.display = 'block';
+            } catch (error) {
+                document.getElementById('us_error').textContent = error.message;
+                document.getElementById('us_error').style.display = 'block';
+            } finally {
+                document.getElementById('us_loading').style.display = 'none';
+            }
+        }
+
+        function displayUserSessionsData(data) {
+            const table = document.getElementById('us_dataTable');
+            const tbody = document.getElementById('userSessionsTableBody');
+            tbody.innerHTML = '';
+            data.data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.username || 'N/A'}</td>
+                    <td>${row.fake_user_id || 'N/A'}</td>
+                    <td>${row.country || 'N/A'}</td>
+                    <td>${row.total_sessions || 0}</td>
+                    <td>${row.total_play_time || 0} minutes</td>
+                    <td>${row.days_retained || 0}</td>
+                    <td>${row.retention_percentage || 0}%</td>
+                    <td>
+                        <button class="btn btn-small" onclick="showUserSessionDetails(${index})">
+                            <i class="fas fa-eye"></i> Details
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            table.style.display = 'table';
+        }
+
+        function showUserSessionDetails(index) {
+            const userData = us_currentData.data[index];
+            const modal = document.getElementById('userSessionModal');
+            const modalContent = document.getElementById('userSessionModalContent');
+            
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <h3>Session Details for ${userData.username || 'Unknown User'}</h3>
+                    <span class="close" onclick="closeUserSessionModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <h4>Username</h4>
+                            <p>${userData.username || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>User ID</h4>
+                            <p>${userData.user_id || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Fake User ID</h4>
+                            <p>${userData.fake_user_id || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Country</h4>
+                            <p>${userData.country || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>User Type</h4>
+                            <p>${userData.user_type || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Platform</h4>
+                            <p>${userData.platform || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>App Version</h4>
+                            <p>${userData.app_version || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Source</h4>
+                            <p>${userData.source || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Total Sessions</h4>
+                            <p>${userData.total_sessions || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Total Play Time</h4>
+                            <p>${userData.total_play_time || 0} minutes</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Average Play Time</h4>
+                            <p>${userData.average_play_time || 0} minutes</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Days Retained</h4>
+                            <p>${userData.days_retained || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Retention Percentage</h4>
+                            <p>${userData.retention_percentage || 0}%</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Total Days Visited</h4>
+                            <p>${userData.total_days_visited || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>First Open Date</h4>
+                            <p>${userData.first_open_date ? new Date(userData.first_open_date).toLocaleDateString() : 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Last Event</h4>
+                            <p>${userData.last_event || 'N/A'}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>Retained from Previous Day</h4>
+                            <p>${userData.retained_from_previous_day ? 'Yes' : 'No'}</p>
+                        </div>
+                    </div>
+
+                    <h3>Session Times</h3>
+                    <div class="detail-item">
+                        <h4>All Session Times</h4>
+                        <p>${userData.session_times && userData.session_times.length > 0 ? userData.session_times.join(', ') : 'N/A'}</p>
+                    </div>
+
+                    <h3>Day 0 Sessions</h3>
+                    <div class="detail-item">
+                        <h4>Day 0 Total Sessions</h4>
+                        <p>${userData.d0_total_sessions || 0}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Day 0 Session Lengths</h4>
+                        <p>${userData.d0_session_lengths && userData.d0_session_lengths.length > 0 ? userData.d0_session_lengths.join(', ') : 'N/A'}</p>
+                    </div>
+
+                    <h3>Daily Play Time Breakdown</h3>
+                    <div class="day-breakdown">`;
+
+            // Add day breakdown
+            for (let i = 0; i <= 30; i++) {
+                const dayKey = `day${i}_play_time`;
+                const playTime = userData[dayKey] || 0;
+                modalContent.innerHTML += `
+                    <div class="day-item">
+                        <div class="day-label">Day ${i}</div>
+                        <div class="day-value">${playTime} minutes</div>
+                    </div>`;
+            }
+
+            modalContent.innerHTML += `
+                    </div>
+
+                    <h3>Game-Specific Metrics</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <h4>BBE Total Play Time</h4>
+                            <p>${userData.bbe_total_play_time || 0} minutes</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE CL1-A Total Completes</h4>
+                            <p>${userData.bbe_cl1_a_total_completes || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE CLA Total Play Time</h4>
+                            <p>${userData.bbe_cla_total_play_time || 0} minutes</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE CL1-B Total Completes</h4>
+                            <p>${userData.bbe_cl1_b_total_completes || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE CLB Total Play Time</h4>
+                            <p>${userData.bbe_clb_total_play_time || 0} minutes</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE OE2-1 Total Completes</h4>
+                            <p>${userData.bbe_oe2_1_total_completes || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE OE2-1 Total Play Time</h4>
+                            <p>${userData.bbe_oe2_1_total_play_time || 0} minutes</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE OE2-2 Total Completes</h4>
+                            <p>${userData.bbe_oe2_2_total_completes || 0}</p>
+                        </div>
+                        <div class="detail-item">
+                            <h4>BBE OE2-2 Total Play Time</h4>
+                            <p>${userData.bbe_oe2_2_total_play_time || 0} minutes</p>
+                        </div>
+                    </div>
+
+                    <h3>User Path</h3>
+                    <div class="detail-item">
+                        <h4>Event Sequence</h4>
+                        <p>${userData.path || 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        function closeUserSessionModal() {
+            document.getElementById('userSessionModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('userSessionModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function clearUserSessionsFilters() {
+            [
+                'us_startDate','us_endDate','us_userId','us_fakeUserId','us_country','us_userType','us_platform','us_minSessions','us_maxSessions','us_minPlayTime','us_maxPlayTime','us_minRetentionDays','us_maxRetentionDays','us_page','us_limit'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('us_page').value = '1';
+            document.getElementById('us_limit').value = '50';
+        }
+
+        function exportUserSessionsToCSV() {
+            if (!us_currentData || !us_currentData.data) return;
+            const rows = us_currentData.data;
+            const headers = [
+                'username','fake_user_id','country','user_type','platform','app_version','source','total_sessions','session_times','total_play_time','path',
+                'day0_play_time','day1_play_time','day2_play_time','day3_play_time','day4_play_time','day5_play_time','day6_play_time','day7_play_time','day8_play_time','day9_play_time','day10_play_time','day11_play_time','day12_play_time','day13_play_time','day14_play_time','day15_play_time','day16_play_time','day17_play_time','day18_play_time','day19_play_time','day20_play_time','day21_play_time','day22_play_time','day23_play_time','day24_play_time','day25_play_time','day26_play_time','day27_play_time','day28_play_time','day29_play_time','day30_play_time','last_event','total_days_visited','days_retained','first_open_date','average_play_time','retained_from_previous_day','retention_percentage','bbe_total_play_time','bbe_cl1_a_total_completes','bbe_cla_total_play_time','bbe_cl1_b_total_completes','bbe_clb_total_play_time','bbe_oe2_1_total_completes','bbe_oe2_1_total_play_time','bbe_oe2_2_total_completes','bbe_oe2_2_total_play_time','d0_total_sessions','d0_session_lengths'
+            ];
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += headers.map(h => {
+                    let val = row[h];
+                    if (Array.isArray(val)) val = val.join('; ');
+                    if (val === undefined) val = '';
+                    return `"${val}"`;
+                }).join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `user-sessions-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html> 
